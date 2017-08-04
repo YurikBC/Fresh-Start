@@ -1,0 +1,970 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "API for job posting website",
+        "description": "API for website that provides job vacancies in various IT companies all over Belarus. This web-application is ment for students as well as for people with no (or little) working experience in IT sphere, as it offers exactly those positions, where no experience is required.",
+        "version": "1.0.0"
+    },
+    "basePath": "/api",
+    "paths": {
+        "/authenticate": {
+            "get": {
+                "tags": [
+                    "authenticate"
+                ],
+                "summary": "Get info about user",
+                "description": "Getting information about the user",
+                "operationId": "getUserInfo",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "name": "nikasd",
+                                    "email": "asdqwee@mail.ru",
+                                    "registered_at": "2017-07-31 11:33:07"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid token",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": "400",
+                                    "title": "Invalid token",
+                                    "detail": "Could not decode token: The token \"eyJ0eXAiOiJKV1QiLCJhsbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTM2NzIwNDgsInN1YiI6NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNTAxNTc2MDQ5LCJuYmYiOjE1MDE1NzYwNDksImp0aSI6IkZVcW42NXRlY0xDSm5kN1AifQ.K2wOp6Qk0URWaYV_FXxTqWQPx-zyyzglVryMpvLYZgU\" is an invalid JWS"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": "400",
+                                    "title": "Invalid token",
+                                    "detail": "The token has been blacklisted"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "authenticate"
+                ],
+                "summary": "Login",
+                "description": "Authenticate user with email and password",
+                "operationId": "getToken",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "User email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "User password",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "remember",
+                        "in": "formData",
+                        "description": "Remember user",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTM2ODI1MDQsInN1YiI6NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNTAxNTg2NTA0LCJuYmYiOjE1MDE1ODY1MDQsImp0aSI6ImJvM3E3OG9uQjEySE1ZU0oifQ.hQNn9CYY0GHvDZ2xCC3KD6kOM6tQllQpieyx4bSOauk"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Access is denied",
+                        "examples": [
+                            {
+                                "application/json": {
+                                    "errors": {
+                                        "status": "401",
+                                        "title": "Access is denied",
+                                        "detail": "Wrong password",
+                                        "source": {
+                                            "parameter": "http:\\/\\/localhost\\/api\\/authenticate"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "application/json": {
+                                    "errors": {
+                                        "status": "401",
+                                        "title": "Access is denied",
+                                        "detail": "Wrong email",
+                                        "source": {
+                                            "parameter": "http:\\/\\/localhost\\/api\\/authenticate"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "500": {
+                        "description": "Undeclared error",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": "500",
+                                    "title": "Undeclared error",
+                                    "detail": "Something went wrong!",
+                                    "source": {
+                                        "parameter": "http:\\/\\/localhost\\/api\\/authenticate"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/authenticate/{token}": {
+            "delete": {
+                "tags": [
+                    "authenticate"
+                ],
+                "summary": "Logout",
+                "description": "Brings a token to the black list",
+                "operationId": "logoutUser",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "description": "token",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "examples": {
+                            "application/json": {
+                                "name": "nikasd",
+                                "email": "asdqwee@mail.ru"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token in the blacklist",
+                        "examples": {
+                            "application/json": {
+                                "error": {
+                                    "status": 401,
+                                    "title": "Bad Request",
+                                    "detail": "The token has been blacklisted",
+                                    "source": {
+                                        "parameter": "http://localhost/api/authenticate/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjYsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3QvYXBpL2F1dGhlbnRpY2F0ZSIsImlhdCI6MTUwMTU5MDEzOCwiZXhwIjoxNTAxNTkzNzM4LCJuYmYiOjE1MDE1OTAxMzgsImp0aSI6ImxFM1c1bzVIN1VSTzQ5U2EifQ.lsI26YI_528SKXyG9K189Nle-2HRLUpG2DOro6Aa6Oc"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid token",
+                        "examples": {
+                            "application/json": {
+                                "error": {
+                                    "status": 400,
+                                    "title": "Bad Request",
+                                    "detail": "Could not decode token: The token \"eyJ0eXAiOiJKV1QiLCJhsbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTM2NzIwNDgsInN1YiI6NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNTAxNTc2MDQ5LCJuYmYiOjE1MDE1NzYwNDksImp0aSI6IkZVcW42NXRlY0xDSm5kN1AifQ.K2wOp6Qk0URWaYV_FXxTqWQPx-zyyzglVryMpvLYZgU\" is an invalid JWS",
+                                    "source": {
+                                        "parameter": "http://localhost/api/authenticate/eyJ0eXAiOiJKV1QiLCJhsbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTM2NzIwNDgsInN1YiI6NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNTAxNTc2MDQ5LCJuYmYiOjE1MDE1NzYwNDksImp0aSI6IkZVcW42NXRlY0xDSm5kN1AifQ.K2wOp6Qk0URWaYV_FXxTqWQPx-zyyzglVryMpvLYZgU"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/filter": {
+            "get": {
+                "tags": [
+                    "filterVacancies"
+                ],
+                "summary": "Get filtered jobs",
+                "description": "Filter vacancies by city and employment",
+                "operationId": "filterVacancies",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "Filter by city",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Number of the page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "number",
+                        "in": "query",
+                        "description": "Number of vacancies",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "employment",
+                        "in": "query",
+                        "description": "Filter by employment",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "current_page": 1,
+                                    "data": [
+                                        {
+                                            "title": "exposit",
+                                            "location": "Grodno",
+                                            "description": "asdasdasda",
+                                            "url": "sasd",
+                                            "date": 123542135123,
+                                            "employment": "exposit",
+                                            "company": "sec"
+                                        }
+                                    ],
+                                    "from": 1,
+                                    "last_page": 1,
+                                    "next_page_url": null,
+                                    "path": "http://localhost/api/filter",
+                                    "per_page": 10,
+                                    "prev_page_url": null,
+                                    "to": 1,
+                                    "total": 1
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "error": {
+                                        "status": 400,
+                                        "title": "Bad Request",
+                                        "detail": "No parameters for filtering",
+                                        "source": {
+                                            "parameter": "http://localhost/api/filter"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/password_reset": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Resets password for user",
+                "description": "Resets password for user in case it was forgotten",
+                "operationId": "password_reset",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "Email of the user",
+                        "required": true,
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password reset attempt received",
+                        "examples": {
+                            "application/json": {
+                                "data": "If email is correct, you will get the letter with your new password within few minutes"
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid email",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": "422",
+                                    "title": "Invalid data",
+                                    "description": {
+                                        "email": "[The email must be a valid email address.]"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/register": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Registers new user",
+                "description": "Registers new user on website",
+                "operationId": "registerUser",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "formData",
+                        "description": "Name of the user",
+                        "required": true,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "Email of the user",
+                        "required": true,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Password of the user",
+                        "required": true,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "password_confirmation",
+                        "in": "formData",
+                        "description": "Password confirmation",
+                        "required": true,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "city",
+                        "in": "formData",
+                        "description": "City where the user live",
+                        "required": true,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "phone",
+                        "in": "formData",
+                        "description": "Mobile phone number of the user",
+                        "required": false,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "newsletter",
+                        "in": "formData",
+                        "description": "Agreement of the user for getting newsletter with suitable jobs (filter by city)",
+                        "required": true,
+                        "type": "string",
+                        "default": "0"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "examples": {
+                            "application/json": {
+                                "data": "user registered"
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid user data",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": "422",
+                                    "title": "Invalid data",
+                                    "description": {
+                                        "email": "[The email has already been taken.]",
+                                        "city": "[The city field is required.]"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/favorite": {
+            "get": {
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Send all favorite vacancies",
+                "description": "Send all favorite vacancies",
+                "operationId": "SendFavorite",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "favorite",
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "id": 9,
+                                    "title": "Junior Python Developer",
+                                    "location": "\u0412\u0438\u0442\u0435\u0431\u0441\u043a",
+                                    "description": "description vacancy with HTML",
+                                    "url": "https://jobs.tut.by/vacancy/21524322?query=junior",
+                                    "date": 1501113600000,
+                                    "employment": "\u041f\u043e\u043b\u043d\u0430\u044f \u0437\u0430\u043d\u044f\u0442\u043e\u0441\u0442\u044c, \u043f\u043e\u043b\u043d\u044b\u0439 \u0434\u0435\u043d\u044c",
+                                    "company": " iTechArt Group",
+                                    "address": {
+                                        "type": "Point",
+                                        "coordinates": [
+                                            27.544296,
+                                            53.888329
+                                        ]
+                                    },
+                                    "created_at": "2017-07-29 15:29:07",
+                                    "updated_at": "2017-07-29 15:29:07"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Not found favorite vacancies",
+                        "examples": {
+                            "error": {
+                                "status": 204,
+                                "title": "Not found favorite vacancies",
+                                "source": {
+                                    "parameter": "http://localhost/favorite"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/favorite/{id}": {
+            "put": {
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Add vacancy to favorite",
+                "description": "Add vacancy to favorite",
+                "operationId": "Add vacancy to favorite",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id vacancy",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "New vacancy not found",
+                        "examples": {
+                            "data": {
+                                "type": "vacancy",
+                                "attributes": {
+                                    "title": "\u0421\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0441\u0442 \u043f\u043e \u0438\u043d\u0442\u0435\u0440\u043d\u0435\u0442-\u043c\u0430\u0440\u043a\u0435\u0442\u0438\u043d\u0433\u0443",
+                                    "src": "http://localhost/api/detail/104"
+                                },
+                                "relationships": {
+                                    "user": {
+                                        "data": {
+                                            "type": "people",
+                                            "id": 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Delete vacancy from favorite",
+                "description": "Delete vacancy from favorite",
+                "operationId": "Delete vacancy from favorite",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id vacancy",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "detelete from favorite"
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/user/show": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Show user info",
+                "description": "Return information about currently authenticated user",
+                "operationId": "showUser",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User information fetched successfully",
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "id": "32",
+                                    "name": "Alex",
+                                    "email": "alex@mailserver.org",
+                                    "city": "\u041c\u0438\u043d\u0441\u043a",
+                                    "phone": "+375123456789",
+                                    "newsletter": "1",
+                                    "status": "1",
+                                    "created_at": "2017-07-25 12:13:36",
+                                    "updated_at": "2017-07-27 10:57:36"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Token absent",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": 400,
+                                    "title": "Token absent",
+                                    "detail": "Token can not be parsed from the request headers"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/user/update": {
+            "patch": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user info",
+                "description": "Update information about currently authenticated user",
+                "operationId": "updateUser",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "formData",
+                        "description": "Name of the user",
+                        "required": false,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Password of the user",
+                        "required": false,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "password_confirmation",
+                        "in": "formData",
+                        "description": "Password confirmation (REQUIRED IF password IS SET)",
+                        "required": false,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "city",
+                        "in": "formData",
+                        "description": "City where the user live",
+                        "required": false,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "phone",
+                        "in": "formData",
+                        "description": "Mobile phone number of the user",
+                        "required": false,
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    {
+                        "name": "newsletter",
+                        "in": "formData",
+                        "description": "Agreement of the user for getting newsletter with suitable jobs",
+                        "required": false,
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User information updated successfully",
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "id": "32",
+                                    "name": "Alex",
+                                    "email": "alex@mailserver.org",
+                                    "city": "\u041c\u0438\u043d\u0441\u043a",
+                                    "phone": "+375987654321",
+                                    "newsletter": "1",
+                                    "status": "1",
+                                    "created_at": "2017-07-25 12:13:36",
+                                    "updated_at": "2017-07-27 10:57:36"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Provided data is invalid and can not be used",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": 422,
+                                    "title": "Invalid data",
+                                    "detail": {
+                                        "name": "The name field is required."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/activate/{token}": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Activating a user",
+                "description": "Activating a user by confirming email address",
+                "operationId": "activateUser",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "description": "Token for activation",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User activated",
+                        "examples": {
+                            "application/json": {
+                                "data": {
+                                    "token": "db5d8d8ab7f0c37f717856469fde30de6b2a242f77f60fbb929167ef5abb8f386ba36851eb9b5d99c50b0a0f60e113575d534122a8d7e1c80d5698fd7484f37d"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid user data",
+                        "examples": {
+                            "application/json": {
+                                "errors": {
+                                    "status": "422",
+                                    "title": "Invalid token",
+                                    "detail": "Provided token not exist"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/?page=1&limit=1": {
+            "get": {
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Paginate vacancies",
+                "description": "Paginate vacancies",
+                "operationId": "paginatinVacancy",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "description": "Number page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "path",
+                        "description": "Number of vacancies",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "paginate",
+                        "examples": {
+                            "application/json": {
+                                "current_page": 3,
+                                "data": {
+                                    "id": 9,
+                                    "title": "Junior Python Developer",
+                                    "location": "\u0412\u0438\u0442\u0435\u0431\u0441\u043a",
+                                    "description": "description vacancy with HTML",
+                                    "url": "https://jobs.tut.by/vacancy/21524322?query=junior",
+                                    "date": 1501113600000,
+                                    "employment": "\u041f\u043e\u043b\u043d\u0430\u044f \u0437\u0430\u043d\u044f\u0442\u043e\u0441\u0442\u044c, \u043f\u043e\u043b\u043d\u044b\u0439 \u0434\u0435\u043d\u044c",
+                                    "company": " iTechArt Group",
+                                    "address": {
+                                        "type": "Point",
+                                        "coordinates": [
+                                            27.544296,
+                                            53.888329
+                                        ]
+                                    },
+                                    "created_at": "2017-07-29 15:29:07",
+                                    "updated_at": "2017-07-29 15:29:07"
+                                },
+                                "from": 3,
+                                "last_page": 22,
+                                "next_page_url": "http://localhost/api?page=4",
+                                "path": "http://localhost/api",
+                                "per_page": "1",
+                                "prev_page_url": "http://localhost/api?page=2",
+                                "to": 3,
+                                "total": 22
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "New vacancies not found",
+                        "examples": {
+                            "error": {
+                                "status": 204,
+                                "title": "New vacancy not found",
+                                "source": {
+                                    "parameter": "http://localhost/api?number=20&page=3"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/detail/{id}": {
+            "get": {
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Detail vacancy",
+                "description": "Detail vacancy",
+                "operationId": "detailVacancy",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id vacancy",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "detail",
+                        "examples": {
+                            "application/json": {
+                                "id": 12,
+                                "title": "Junior Account Manager",
+                                "location": "\u0413\u043e\u043c\u0435\u043b\u044c",
+                                "description": "description vacancy with HTML",
+                                "url": "https://jobs.tut.by/vacancy/22092038?query=junior",
+                                "date": 1500940800000,
+                                "employment": "\u041f\u043e\u043b\u043d\u0430\u044f \u0437\u0430\u043d\u044f\u0442\u043e\u0441\u0442\u044c, \u043f\u043e\u043b\u043d\u044b\u0439 \u0434\u0435\u043d\u044c",
+                                "company": " Oxagile",
+                                "address": null,
+                                "created_at": "2017-07-29 15:29:07",
+                                "updated_at": "2017-07-29 15:29:07"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "New vacancy not found",
+                        "examples": {
+                            "error": {
+                                "status": 204,
+                                "title": "New vacancy not found",
+                                "source": {
+                                    "parameter": "http://localhost/api/detail/125"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {},
+    "securityDefinitions": {
+        "api_key": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
